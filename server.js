@@ -9,7 +9,7 @@ import UserModel from "./models/User.js";
 dotenv.config();
 
 
-mongoose.connect(process.env.MONGOURI);
+mongoose.connect(process.env.MONGO_URI);
 
 const app = express();
 const PORT = 3003;
