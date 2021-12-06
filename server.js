@@ -3,6 +3,8 @@ import session from "express-session";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
+import mongoose from "mongoose";
+import User from "./models/User.js";
 
 dotenv.config();
 
