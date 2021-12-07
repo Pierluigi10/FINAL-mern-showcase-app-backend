@@ -88,13 +88,12 @@ app.get("/currentuser", async (req, res) => {
   res.json(user);
 });
 
+
 app.get("/notyetapprovedusers", async (req, res) => {
-  const users = await UserModel.find({
-    accessGroups: { $regex: "notYetApprovedUsers", $options: "i" },
-  });
-  res.json({
-    users,
-  });
+	const users = await UserModel.find({ "accessGroups": { "$regex": "notYetApprovedUsers", "$options": "i" } });
+	res.json({
+		users
+	});
 });
 
 app.get("/logout", async (req, res) => {
@@ -104,5 +103,5 @@ app.get("/logout", async (req, res) => {
 });
 
 app.listen(PORT, (req, res) => {
-  console.log(`API listening on port ${PORT}`);
+  console.log(`API listening on port http://localhost:${PORT}`);
 });
