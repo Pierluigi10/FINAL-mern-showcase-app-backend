@@ -15,14 +15,15 @@ content-type: application/json
 POST {{url}}/signup
 content-type: application/json
 
-{
+{ 
+    "user": {
     "firstName": "Giacomo",
     "lastName": "Tolari",
     "login": "gc",
     "email": "gc@gmail.com",
-    "password1": "nnn",
-    "password2": "nnn",
-    "accessGroups": "loggedInUsers, notYetApprovedUsers",
+    "password1": "1234567",
+    "password2": "1234567"
+    }
 }
 
 

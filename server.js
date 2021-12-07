@@ -5,8 +5,11 @@ import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
 import UserModel from "./models/User.js";
+import bcrypt from "bcrypt";
 
 dotenv.config();
+
+const saltRounds = Number(process.env.SALT);
 
 mongoose.connect(process.env.MONGO_URI);
 
@@ -52,18 +55,28 @@ app.post("/login", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   const frontendUser = req.body.user;
-  const backendUser = {
-    firstName: frontendUser.firstName,
-    lastName: frontendUser.lastName,
-    login: frontendUser.login,
-    email: frontendUser.email,
-    hash: "nnn",
-    accessGroups: "loggedInUsers, notYetApprovedUsers",
-  };
-  const dbuser = await UserModel.create(backendUser);
-  res.json({
-    userAdded: dbuser,
-  });
+  if (
+    frontendUser.login.trim() === "" ||
+    frontendUser.password1.trim() === "" ||
+    frontendUser.password1 !== frontendUser.password2
+  ) {
+    res.sendStatus(403);
+  } else {
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hash = await bcrypt.hash(frontendUser.password1, salt);
+    const backendUser = {
+      firstName: frontendUser.firstName,
+      lastName: frontendUser.lastName,
+      login: frontendUser.login,
+      email: frontendUser.email,
+      hash,
+      accessGroups: "loggedInUsers, notYetApprovedUsers",
+    };
+    const dbuser = await UserModel.create(backendUser);
+    res.json({
+      userAdded: dbuser,
+    });
+  }
 });
 
 app.get("/currentuser", async (req, res) => {
