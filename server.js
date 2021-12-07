@@ -59,6 +59,15 @@ app.get("/currentuser", async (req, res) => {
   res.json(user);
 });
 
+app.get("/notyetapprovedusers", async (req, res) => {
+  const users = await UserModel.find({
+    accessGroups: { $regex: "notYetApprovedUsers", $options: "i" },
+  });
+  res.json({
+    users,
+  });
+});
+
 app.get("/logout", async (req, res) => {
   req.session.destroy();
   const user = await UserModel.findOne({ username: "anonymousUser" });
