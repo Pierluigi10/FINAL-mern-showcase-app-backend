@@ -8,11 +8,13 @@ import UserModel from "./models/User.js";
 
 dotenv.config();
 
-
 mongoose.connect(process.env.MONGO_URI);
 
 const app = express();
 const PORT = 3003;
+
+const user = await User.findOne({ username: "anonymousUser" });
+res.json(user);
 
 app.use(
   cors({
@@ -55,7 +57,7 @@ app.get("/currentuser", async (req, res) => {
   res.json(user);
 });
 
-app.get("/logout", async(req, res) => {
+app.get("/logout", async (req, res) => {
   req.session.destroy();
   const user = await UserModel.findOne({ username: "anonymousUser" });
   res.json(user);
@@ -64,4 +66,3 @@ app.get("/logout", async(req, res) => {
 app.listen(PORT, (req, res) => {
   console.log(`API listening on port ${PORT}`);
 });
-
