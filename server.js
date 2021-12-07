@@ -13,8 +13,8 @@ mongoose.connect(process.env.MONGO_URI);
 const app = express();
 const PORT = 3003;
 
-const user = await User.findOne({ username: "anonymousUser" });
-res.json(user);
+// const user = await User.findOne({ login: "anonymousUser" });
+// res.json(user);
 
 app.use(
   cors({
@@ -38,23 +38,38 @@ app.get("/user", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const username = req.body.username;
+  const login = req.body.login;
   // const password = req.body.password;
-  let user = await UserModel.findOne({ username: username });
+  console.log(login);
+  let user = await UserModel.findOne({ login });
   if (!user) {
-    user = await UserModel.findOne({ username: "anonymousUser" });
+    user = await UserModel.findOne({ login: "anonymousUser" });
   }
   req.session.user = user;
   req.session.save();
   res.json(user);
 });
 
-app.post("/signup", async (req, res) => {});
+app.post("/signup", async (req, res) => {
+  const frontendUser = req.body.user;
+  const backendUser = {
+    firstName: frontendUser.firstName,
+    lastName: frontendUser.lastName,
+    login: frontendUser.login,
+    email: frontendUser.email,
+    hash: "nnn",
+    accessGroups: "loggedInUsers, notYetApprovedUsers",
+  };
+  const dbuser = await UserModel.create(backendUser);
+  res.json({
+    userAdded: dbuser,
+  });
+});
 
 app.get("/currentuser", async (req, res) => {
   let user = req.session.user;
   if (!user) {
-    user = await UserModel.findOne({ username: "anonymousUser" });
+    user = await UserModel.findOne({ login: "anonymousUser" });
   }
   res.json(user);
 });
@@ -70,7 +85,7 @@ app.get("/notyetapprovedusers", async (req, res) => {
 
 app.get("/logout", async (req, res) => {
   req.session.destroy();
-  const user = await UserModel.findOne({ username: "anonymousUser" });
+  const user = await UserModel.findOne({ login: "anonymousUser" });
   res.json(user);
 });
 

@@ -6,8 +6,23 @@ POST {{url}}/login
 content-type: application/json
 
 {
-    "username": "kc",
+    "login": "kc",
     "password": "ppp"
+}
+
+
+### user signup
+POST {{url}}/signup
+content-type: application/json
+
+{
+    "firstName": "Giacomo",
+    "lastName": "Tolari",
+    "login": "gc",
+    "email": "gc@gmail.com",
+    "password1": "nnn",
+    "password2": "nnn",
+    "accessGroups": "loggedInUsers, notYetApprovedUsers",
 }
 
 
