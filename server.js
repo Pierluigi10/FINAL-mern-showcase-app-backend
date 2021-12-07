@@ -49,6 +49,8 @@ app.post("/login", async (req, res) => {
   res.json(user);
 });
 
+app.post("/signup", async (req, res) => {});
+
 app.get("/currentuser", async (req, res) => {
   let user = req.session.user;
   if (!user) {
