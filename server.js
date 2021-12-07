@@ -55,6 +55,7 @@ app.post("/login", async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   const frontendUser = req.body.user;
+  // console.log(frontendUser);
   if (
     frontendUser.login.trim() === "" ||
     frontendUser.password1.trim() === "" ||
