@@ -45,17 +45,25 @@ app.get("/user", async (req, res) => {
   res.json(user);
 });
 
+//bcrypt.compare('password', theHash).then(result => console.log(result));
 app.post("/login", async (req, res) => {
   const login = req.body.login;
-  // const password = req.body.password;
+  const password = req.body.password;
   console.log(login);
   let user = await UserModel.findOne({ login });
   if (!user) {
     user = await UserModel.findOne({ login: "anonymousUser" });
+  } else {
+    bcrypt.compare(password, user.hash).then((passwordIsOk) => {
+      if (passwordIsOk) {
+        req.session.user = user;
+        req.session.save();
+        res.json(user);
+      } else {
+        res.sendStatus(403);
+      }
+    });
   }
-  req.session.user = user;
-  req.session.save();
-  res.json(user);
 });
 
 app.post("/signup", async (req, res) => {
