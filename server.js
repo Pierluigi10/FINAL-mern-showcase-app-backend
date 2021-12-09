@@ -15,6 +15,7 @@ const PORT = process.env.PORT || 3003;
 
 const saltRounds = Number(process.env.SALT);
 
+
 const mongoConnectString = process.env.MONGO_URI
 mongoose.connect(mongoConnectString);
 
@@ -29,7 +30,7 @@ const userIsInGroup = (user, accessGroup) => {
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.ORIGIN_URL,
     credentials: true,
   })
 );
