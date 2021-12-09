@@ -9,16 +9,13 @@ import bcrypt from "bcrypt";
 
 dotenv.config();
 
-
 const app = express();
 const PORT = process.env.PORT || 3003;
 
 const saltRounds = Number(process.env.SALT);
 
-
-const mongoConnectString = process.env.MONGO_URI
+const mongoConnectString = process.env.MONGO_URI;
 mongoose.connect(mongoConnectString);
-
 
 const userIsInGroup = (user, accessGroup) => {
   const accessGroupArray = user.accessGroups.split(",").map((m) => m.trim());
@@ -105,15 +102,20 @@ app.get("/currentuser", async (req, res) => {
   res.json(user);
 });
 
+//approve the users
 app.post("/approveuser", async (req, res) => {
   const id = req.body.id;
   let user = req.session.user;
+console.log(id, user)
   if (!user) {
+    console.log("1111");
     res.sendStatus(403);
   } else {
     if (!userIsInGroup(user, "admins")) {
+      console.log("2222")
       res.sendStatus(403);
     } else {
+      console.log("333")
       const updateResult = await UserModel.findOneAndUpdate(
         { _id: new mongoose.Types.ObjectId(id) },
         { $set: { accessGroups: "loggedInUsers,members" } },

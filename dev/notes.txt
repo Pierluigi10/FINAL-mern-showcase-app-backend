@@ -1,0 +1,1 @@
+mongoimport --host cluster0-shard-00-01.i2mzc.mongodb.net:27017 --db mernshowcase --collection users --type json --file mernshowcase.users.json --jsonArray --authenticationDatabase admin --ssl --username mainUser
