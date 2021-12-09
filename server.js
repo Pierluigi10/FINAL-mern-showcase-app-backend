@@ -1,5 +1,6 @@
 import express from "express";
 import session from "cookie-session";
+// import session from "express-session";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -12,7 +13,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3003;
 
-const saltRounds = Number(process.env.SALT);
+const saltRounds = Number(process.env.SALTROUNDS);
 
 const mongoConnectString = process.env.MONGO_URI;
 mongoose.connect(mongoConnectString);
@@ -33,13 +34,18 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  session({
-    resave: true,
-    saveUninitialized: true,
-    secret: process.env.SESSION_SECRET,
-  })
-);
+// app.use(
+//   session({
+//     resave: true,
+//     saveUninitialized: true,
+//     secret: process.env.SESSION_SECRET,
+//   })
+// );
+app.use(session({
+  name: 'session',
+  keys: ['key1', 'key2']
+}))
+
 
 app.get("/user", async (req, res) => {
   const user = await UserModel.find();
