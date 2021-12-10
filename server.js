@@ -1,6 +1,6 @@
 import express from "express";
-import session from "cookie-session";
-// import session from "express-session";
+// import session from "cookie-session";
+import session from "express-session";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -41,11 +41,53 @@ app.use(cookieParser());
 //     secret: process.env.SESSION_SECRET,
 //   })
 // );
-app.use(session({
-  name: 'session',
-  keys: ['key1', 'key2']
-}))
 
+app = express();
+app.set("trust proxy", 1);
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    proxy: true,
+    secureProxy: true,
+    cookie: {
+      secure: true,
+      httpOnly: true,
+      maxAge: 60 * 1000 * 30
+    },
+  })
+);
+
+// LOCAL CONFIGURATION (for localhost)
+// app.use(
+//   session({
+//     name: "sessId",
+//     // secret: "h$lYS$cr§t!",
+//     secret:process.env.SESSION_SECRET,
+//     resave: false,
+//     saveUninitialized: false,
+//     cookie: {
+//       httpOnly: true, // httpOnly => cookie can just be written from API and not by Javascript
+//       maxAge: 60 * 1000 * 30, // 30 minutes of inactivity
+//     },
+//   })
+// );
+// app.set("trust proxy", 1);
+
+// Manually Set Cookie:
+//  res.cookie("token", "ey12345", {
+//    httpOnly: true, // httpOnly => cookie can just be written from API and not by Javascript
+//    maxAge: 60*1000*30, // 30 minutes of inactivity
+//    sameSite: "none", // allow cookies transfered from OTHER origin
+//    secure: true // allow cookies to be set just via HTTPS
+//  })
+
+// app.use(session({
+//   name: 'session',
+//   keys: ['key1', 'key2']
+// }))
 
 app.get("/user", async (req, res) => {
   const user = await UserModel.find();
@@ -112,16 +154,16 @@ app.get("/currentuser", async (req, res) => {
 app.post("/approveuser", async (req, res) => {
   const id = req.body.id;
   let user = req.session.user;
-console.log(id, user)
+  console.log(id, user);
   if (!user) {
     console.log("1111");
     res.sendStatus(403);
   } else {
     if (!userIsInGroup(user, "admins")) {
-      console.log("2222")
+      console.log("2222");
       res.sendStatus(403);
     } else {
-      console.log("333")
+      console.log("333");
       const updateResult = await UserModel.findOneAndUpdate(
         { _id: new mongoose.Types.ObjectId(id) },
         { $set: { accessGroups: "loggedInUsers,members" } },
