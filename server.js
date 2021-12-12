@@ -1,7 +1,7 @@
 import express from "express";
 // import session from "cookie-session";
 import session from "express-session";
-import cookieParser from "cookie-parser";
+// import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -12,6 +12,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3003;
+app.set("trust proxy", 1); // allow / trust Heroku proxy to forward secure cookies
 
 const saltRounds = Number(process.env.SALTROUNDS);
 
@@ -26,14 +27,38 @@ const userIsInGroup = (user, accessGroup) => {
 // const user = await User.findOne({ login: "anonymousUser" });
 // res.json(user);
 
+// app.use(
+//   cors({
+//     origin: process.env.ORIGIN_URL,
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: process.env.ORIGIN_URL,
-    credentials: true,
+    origin: process.env.ORIGIN_URL || "http://localhost:3000",
+    credentials: true, // accept incoming cookies
   })
 );
-app.use(express.json());
-app.use(cookieParser());
+
+// Configure SESSION COOKIES (=> this will create a cookie in the browser once we set some data into req.session)
+app.use(
+  session({
+    name: "sessId",
+    secret: "h$lYS$cr§t!",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true, // httpOnly => cookie can just be written from API and not by Javascript
+      maxAge: 60 * 1000 * 30, // 30 minutes of inactivity
+      sameSite: "none", // allow cookies transfered from OTHER origin
+      secure: true, // allow cookies to be set just via HTTPS
+    },
+  })
+);
+
+// app.use(express.json());
+// app.use(cookieParser());
 // app.use(
 //   session({
 //     resave: true,
@@ -42,23 +67,24 @@ app.use(cookieParser());
 //   })
 // );
 
-app = express();
-app.set("trust proxy", 1);
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    store: sessionStore,
-    resave: false,
-    saveUninitialized: false,
-    proxy: true,
-    secureProxy: true,
-    cookie: {
-      secure: true,
-      httpOnly: true,
-      maxAge: 60 * 1000 * 30
-    },
-  })
-);
+
+
+// app.set("trust proxy", 1);
+// app.use(
+//   session({
+//     secret: process.env.SESSION_SECRET,
+//     store: sessionStore,
+//     resave: false,
+//     saveUninitialized: false,
+//     proxy: true,
+//     secureProxy: true,
+//     cookie: {
+//       secure: true,
+//       httpOnly: true,
+//       maxAge: 60 * 1000 * 30
+//     },
+//   })
+// );
 
 // LOCAL CONFIGURATION (for localhost)
 // app.use(
