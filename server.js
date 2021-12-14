@@ -24,7 +24,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log(`MongoDB Connected`.cyan.underline))
+  .then(() => console.log(`MongoDB Connected`.cyan.bold))
   .catch((err) => console.log(`Error: ${err.message}`.red.bold));
 
 const userIsInGroup = (user, accessGroup) => {
@@ -174,5 +174,5 @@ app.get("/logout", async (req, res) => {
 });
 
 app.listen(PORT, (req, res) => {
-  console.log(`API listening on port http://localhost:${PORT}`);
+  console.log((("API Listening on port ").yellow) + ((`http://localhost:${PORT}`).yellow.underline.bold));
 });
