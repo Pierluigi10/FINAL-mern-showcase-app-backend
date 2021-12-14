@@ -7,6 +7,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import UserModel from "./models/User.js";
 import bcrypt from "bcrypt";
+import colors from "colors";
 
 dotenv.config();
 
@@ -18,22 +19,18 @@ app.use(express.json());
 const saltRounds = Number(process.env.SALTROUNDS);
 
 const mongoConnectString = process.env.MONGO_URI;
-mongoose.connect(mongoConnectString);
+mongoose
+  .connect(mongoConnectString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log(`MongoDB Connected`.cyan.underline))
+  .catch((err) => console.log(`Error: ${err.message}`.red.bold));
 
 const userIsInGroup = (user, accessGroup) => {
   const accessGroupArray = user.accessGroups.split(",").map((m) => m.trim());
   return accessGroupArray.includes(accessGroup);
 };
-
-// const user = await User.findOne({ login: "anonymousUser" });
-// res.json(user);
-
-// app.use(
-//   cors({
-//     origin: process.env.ORIGIN_URL,
-//     credentials: true,
-//   })
-// );
 
 app.use(
   cors({
@@ -60,61 +57,7 @@ app.use(
   })
 );
 
-// app.use(express.json());
 app.use(cookieParser());
-// app.use(
-//   session({
-//     resave: true,
-//     saveUninitialized: true,
-//     secret: process.env.SESSION_SECRET,
-//   })
-// );
-
-// app.set("trust proxy", 1);
-// app.use(
-//   session({
-//     secret: process.env.SESSION_SECRET,
-//     store: sessionStore,
-//     resave: false,
-//     saveUninitialized: false,
-//     proxy: true,
-//     secureProxy: true,
-//     cookie: {
-//       secure: true,
-//       httpOnly: true,
-//       maxAge: 60 * 1000 * 30
-//     },
-//   })
-// );
-
-// LOCAL CONFIGURATION (for localhost)
-// app.use(
-//   session({
-//     name: "sessId",
-//     // secret: "h$lYS$cr§t!",
-//     secret:process.env.SESSION_SECRET,
-//     resave: false,
-//     saveUninitialized: false,
-//     cookie: {
-//       httpOnly: true, // httpOnly => cookie can just be written from API and not by Javascript
-//       maxAge: 60 * 1000 * 30, // 30 minutes of inactivity
-//     },
-//   })
-// );
-// app.set("trust proxy", 1);
-
-// Manually Set Cookie:
-//  res.cookie("token", "ey12345", {
-//    httpOnly: true, // httpOnly => cookie can just be written from API and not by Javascript
-//    maxAge: 60*1000*30, // 30 minutes of inactivity
-//    sameSite: "none", // allow cookies transfered from OTHER origin
-//    secure: true // allow cookies to be set just via HTTPS
-//  })
-
-// app.use(session({
-//   name: 'session',
-//   keys: ['key1', 'key2']
-// }))
 
 app.get("/user", async (req, res) => {
   const user = await UserModel.find();
