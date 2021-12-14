@@ -1,7 +1,7 @@
 import express from "express";
 // import session from "cookie-session";
 import session from "express-session";
-// import cookieParser from "cookie-parser";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
@@ -13,6 +13,7 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3003;
 app.set("trust proxy", 1); // allow / trust Heroku proxy to forward secure cookies
+app.use(express.json());
 
 const saltRounds = Number(process.env.SALTROUNDS);
 
@@ -45,20 +46,22 @@ app.use(
 app.use(
   session({
     name: "sessId",
-    secret: "h$lYS$cr§t!",
-    resave: false,
-    saveUninitialized: false,
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
     cookie: {
       httpOnly: true, // httpOnly => cookie can just be written from API and not by Javascript
       maxAge: 60 * 1000 * 30, // 30 minutes of inactivity
-      sameSite: "none", // allow cookies transfered from OTHER origin
-      secure: true, // allow cookies to be set just via HTTPS
+      // sameSite: "none", // allow cookies transfered from OTHER origin
+      // secure: true, // allow cookies to be set just via HTTPS
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      secure: process.env.NODE_ENV === "production",
     },
   })
 );
 
 // app.use(express.json());
-// app.use(cookieParser());
+app.use(cookieParser());
 // app.use(
 //   session({
 //     resave: true,
@@ -66,8 +69,6 @@ app.use(
 //     secret: process.env.SESSION_SECRET,
 //   })
 // );
-
-
 
 // app.set("trust proxy", 1);
 // app.use(
@@ -122,6 +123,7 @@ app.get("/user", async (req, res) => {
 
 //bcrypt.compare('password', theHash).then(result => console.log(result));
 app.post("/login", async (req, res) => {
+  console.log(req.body);
   const login = req.body.login;
   const password = req.body.password;
   console.log(login);
