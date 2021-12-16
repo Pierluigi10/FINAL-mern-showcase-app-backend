@@ -59,6 +59,8 @@ app.use(
 
 app.use(cookieParser());
 
+
+
 app.get("/users", async (req, res) => {
   const user = await UserModel.find();
   res.json(user);
@@ -127,14 +129,14 @@ app.post("/approveuser", async (req, res) => {
   let user = req.session.user;
   console.log(id, user);
   if (!user) {
-    console.log("1111");
+    // console.log("1111");
     res.sendStatus(403);
   } else {
     if (!userIsInGroup(user, "admins")) {
-      console.log("2222");
+      // console.log("2222");
       res.sendStatus(403);
     } else {
-      console.log("333");
+      // console.log("333");
       const updateResult = await UserModel.findOneAndUpdate(
         { _id: new mongoose.Types.ObjectId(id) },
         { $set: { accessGroups: "loggedInUsers,members" } },
@@ -175,10 +177,15 @@ app.get("/logout", async (req, res) => {
 
 app.delete("/deleteuser", async (req, res) => {
   const id = req.body.id;
-  const user = await UserModel.findByIdAndDelete({
-    _id: new mongoose.Types.ObjectId(id),
-  });
-  res.json({ user });
+  let user = req.session.user;
+  if (!userIsInGroup(user, "admins")) {
+    res.sendStatus(403);
+  } else {
+    const user = await UserModel.findByIdAndDelete({
+      _id: new mongoose.Types.ObjectId(id),
+    });
+    res.json({ user });
+  }
 });
 
 app.listen(PORT, (req, res) => {
