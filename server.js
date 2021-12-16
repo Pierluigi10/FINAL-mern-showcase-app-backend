@@ -173,6 +173,17 @@ app.get("/logout", async (req, res) => {
   res.json(user);
 });
 
+app.delete("/deleteuser", async (req, res) => {
+  const id = req.body.id;
+  const user = await UserModel.findByIdAndDelete({
+    _id: new mongoose.Types.ObjectId(id),
+  });
+  res.json({ user });
+});
+
 app.listen(PORT, (req, res) => {
-  console.log((("API Listening on port ").yellow) + ((`http://localhost:${PORT}`).yellow.underline.bold));
+  console.log(
+    "API Listening on port ".yellow +
+      `http://localhost:${PORT}`.yellow.underline.bold
+  );
 });

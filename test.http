@@ -28,10 +28,17 @@ content-type: application/json
 
 
 ### show user data
-GET {{url}}/user
+GET {{url}}/users
 content-type: application/json
 
 ### user logout
 GET {{url}}/logout
 content-type: application/json
+
+
+### DELETE USER  
+DELETE {{url}}/deleteuser 
+content-type: application/json
+
+{ "id": "61b20107e2b2ce18af04eb0a"}
 
